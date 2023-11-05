@@ -1,0 +1,4 @@
+gynmansium==0.29.1
+matplotlib==3.8.1
+pandas==2.1.2
+torch==2.1.0
