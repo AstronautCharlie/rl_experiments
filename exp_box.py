@@ -1,14 +1,13 @@
+import logging
 
 from itertools import count
-from params.params import BaseParams 
-from data_structures.telemetries import Step
+from data_structures.step import Step
 from settings import ExpConfig as Config
 
 class ExperimentBox:
-    def __init__(self, *, model, env, telemetry, params: BaseParams):
+    def __init__(self, *, model, env, telemetry):
         self.model = model
         self.env = env
-        self.params = params
         self.telemetry = telemetry
 
     def run_experiment(self):
@@ -18,8 +17,8 @@ class ExperimentBox:
         self.telemetry.write_results()
 
     def experiment_is_over(self):
-        return self.params.completion_conditions_met(self.telemetry)
-
+        return self.telemetry.completion_conditions_met()
+    
     def run_episode(self):
         state, _ = self.env.reset()
         for t in count():
