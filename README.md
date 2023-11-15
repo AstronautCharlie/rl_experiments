@@ -5,6 +5,9 @@ This is a framework for running RL experiments. An experiment consists of:
 - a telemetry definition to record data
 - experiment parameters
 
+# How do I run this? 
+`python app.py`
+
 ## Models
 Implementations of learning algorithms. Must implement the following: 
 - `select_action(state)`
@@ -29,4 +32,4 @@ Must implement the following:
 `python -m pytest . -vv`
 
 # Last Update
-part-way through moving `dqn.py` into actual class in `models/dqn.py`
+Finally got the dimensions right to where `models/dqn.py` will run without breaking - but now I have to actually add the optimization steps

@@ -66,6 +66,7 @@ class DQN(nn.Module):
 policy_net = DQN(n_observations, n_actions).to(device)
 target_net = DQN(n_observations, n_actions).to(device)
 target_net.load_state_dict(policy_net.state_dict())
+print(policy_net)
 
 optimizer = optim.AdamW(policy_net.parameters(), lr=LR, amsgrad=True)
 memory = ReplayMemory(100000)
@@ -81,7 +82,6 @@ def select_action(state):
         with torch.no_grad():
             if steps_done == 10: 
                 logging.info(f'state, policy_net(state) :: {state}, {policy_net(state)}')
-            print(state, policy_net, policy_net(state))
             return policy_net(state).max(1)[1].view(1, 1)
     else:
         return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
@@ -145,7 +145,7 @@ def optimize_model():
 if torch.cuda.is_available():
     num_episodes = 600
 else:
-    num_episodes = 50
+    num_episodes = 600
 
 for i in range(num_episodes):
     state, info = env.reset()
@@ -161,6 +161,9 @@ for i in range(num_episodes):
         else:
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
         
+        if steps_done % 100 == 0: 
+            print(f'state as it comes from the environment: {observation}')
+            print(f'next state after wrapping: {next_state}')
         memory.push(state, action, next_state, reward)
 
         state = next_state
@@ -175,7 +178,8 @@ for i in range(num_episodes):
 
         if done: 
             episode_durations.append(t+1)
-            plot_durations()
+            print(f'steps taken: {t}')
+            #plot_durations()
             break
 
 print('Complete')
