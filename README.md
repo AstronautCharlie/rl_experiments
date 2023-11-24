@@ -32,4 +32,4 @@ Must implement the following:
 `python -m pytest . -vv`
 
 # Last Update
-Finally got the dimensions right to where `models/dqn.py` will run without breaking - but now I have to actually add the optimization steps
+`models/dqn.py` runs but isn't learning - I suspect it's not picking the best action or something. Create a simple environment that does have best actions to take, and see what the model is learning there. Or just troubleshoot more. I think the squeeze in line 105 of `models/dqn.py` to make dimensions fit probably fucked things up. 

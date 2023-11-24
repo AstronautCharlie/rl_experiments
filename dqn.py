@@ -12,6 +12,7 @@ import torch.optim as optim
 import torch.nn.functional as F
 
 import logging
+logging.basicConfig(level=logging.INFO)
 
 env = gym.make('CartPole-v1')
 n_actions = env.action_space.n
@@ -59,6 +60,7 @@ class DQN(nn.Module):
         self.layer3 = nn.Linear(128, n_actions)
 
     def forward(self, x): 
+        print(x.dtype)
         x = F.relu(self.layer1(x))
         x = F.relu(self.layer2(x))
         return self.layer3(x)
@@ -124,11 +126,13 @@ def optimize_model():
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
-
     state_action_values = policy_net(state_batch).gather(1, action_batch)
 
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
     
+    #logging.info(f'next_state_values shape :: {next_state_values.shape}')
+    #logging.info(f'non_final_mask shape : {non_final_mask.shape}')
+    #logging.info(f'target_net(non_final_next_states).shape : {target_net(non_final_next_states).shape}')
     with torch.no_grad():
         next_state_values[non_final_mask] = target_net(non_final_next_states).max(1)[0]
     
@@ -161,9 +165,6 @@ for i in range(num_episodes):
         else:
             next_state = torch.tensor(observation, dtype=torch.float32, device=device).unsqueeze(0)
         
-        if steps_done % 100 == 0: 
-            print(f'state as it comes from the environment: {observation}')
-            print(f'next state after wrapping: {next_state}')
         memory.push(state, action, next_state, reward)
 
         state = next_state

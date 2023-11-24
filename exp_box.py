@@ -21,15 +21,13 @@ class ExperimentBox:
     
     def run_episode(self):
         state, _ = self.env.reset()
-        print(f'first state is {state}')
         for t in count():
             # Get action
             action = self.model.select_action(state)
             # Apply action
             next_state, reward, terminated, truncated, info = self.env.step(action)
-            print(f'next state from exp box {next_state}')
             # Bundle all the step info together
-            step = Step(action, next_state, reward, terminated, truncated, info)
+            step = Step(state, action, next_state, reward, terminated, truncated, info)
             # Make step update to model
             self.step_update(step)
             # if episode is over, make episode update

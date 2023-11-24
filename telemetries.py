@@ -29,6 +29,7 @@ class EpisodeLength(BaseTelemetry):
         pass
 
     def episode_update(self, step_count: int, step_update):
+        logging.info(f'finished episode with step count {step_count}')
         self.add_episode(step_count)
 
     def completion_conditions_met(self):
