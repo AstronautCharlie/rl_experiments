@@ -128,7 +128,7 @@ class DQN(BaseModel):
             return self.get_random_action()
         
     def get_best_action(self, state):
-        state = torch.tensor(state, device='cpu').unsqueeze(0)
+        state = torch.tensor(state, device='cpu', dtype=torch.float32).unsqueeze(0)
         with torch.no_grad():
             #logging.info(f'picking best action') 
             #logging.info(f'action values: {self.policy_net(state)}')

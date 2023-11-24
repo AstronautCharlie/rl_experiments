@@ -23,9 +23,12 @@ class ExperimentBox:
         state, _ = self.env.reset()
         for t in count():
             # Get action
+            logging.info(f'state: {state}')
             action = self.model.select_action(state)
+            logging.info(f'picking action: {action}')
             # Apply action
             next_state, reward, terminated, truncated, info = self.env.step(action)
+            logging.info(f'next state/reward: {next_state}, {reward}')
             # Bundle all the step info together
             step = Step(state, action, next_state, reward, terminated, truncated, info)
             # Make step update to model

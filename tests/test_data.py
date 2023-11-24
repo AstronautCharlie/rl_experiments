@@ -63,6 +63,7 @@ class SimpleEnv:
                 return np.array([0.], dtype=float), 0, False, False, None
             else:
                 # a -> b
+                self.state = np.array([1.])
                 return np.array([1.], dtype=float), 0, False, False, None
         elif self.state == np.array([1.]):
             if action == 0:
@@ -71,11 +72,13 @@ class SimpleEnv:
                 return np.array([1.], dtype=float), 0, False, False, None
             else:
                 # b -> c 
+                self.state = np.array([2.])
                 return np.array([2.], dtype=float), 1, False, False, None
         else:
             if action == 0: 
                 if random.random() < 0.75:
                     # c -> b
+                    self.state = np.array([1.])
                     return np.array([1.], dtype=float), 1, True, False, None
                 else:
                     # c -> c
