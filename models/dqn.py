@@ -16,7 +16,7 @@ class DQN(BaseModel):
                  hidden_layers=[10],
                  input_size=2,
                  output_size=1,
-                 batch_size=128, 
+                 batch_size=10, 
                  gamma=0.99,
                  eps_start=0.9,
                  eps_end=0.05,
@@ -80,6 +80,7 @@ class DQN(BaseModel):
     def optimize_policy_net(self, step):
         if len(self.memory) < self.batch_size:
             return
+
         transitions = self.memory.sample(self.batch_size)
         batch = Transition(*zip(*transitions)) # One Transition of concatenated states/actions/rewards
 
@@ -92,6 +93,9 @@ class DQN(BaseModel):
         action_batch = torch.cat(batch.action).unsqueeze(1)
         # Mx1 shape tensor
         reward_batch = torch.cat(batch.reward)
+
+        #logging.info(f'updating state/action/reward: {state_batch, action_batch, reward_batch}')
+        #logging.info(f'policy net pre-update {self.policy_net(state_batch)}')
 
         # Get the value of each sampled state/action pair, according to policy net
         state_action_values = self.policy_net(state_batch).gather(1, action_batch.long())
@@ -112,6 +116,9 @@ class DQN(BaseModel):
         loss.backward()
         torch.nn.utils.clip_grad_value_(self.policy_net.parameters(), 100)
         self.optimizer.step()
+        
+        #logging.info(f'policy net post-update {self.policy_net(state_batch)}')
+
 
     def update_target_net(self):
         target_net_state_dict = self.target_net.state_dict()

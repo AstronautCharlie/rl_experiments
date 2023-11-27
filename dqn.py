@@ -3,6 +3,8 @@ import math
 import random
 import matplotlib
 import matplotlib.pyplot as plt
+from tests.test_data import SimpleEnv
+
 from collections import namedtuple, deque
 from itertools import count
 
@@ -15,7 +17,9 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 env = gym.make('CartPole-v1')
-n_actions = env.action_space.n
+env = SimpleEnv()
+logging.info(f'using env :: {env}')
+n_actions = 2# env.action_space.n
 state, info = env.reset()
 n_observations = len(state)
 
@@ -60,7 +64,6 @@ class DQN(nn.Module):
         self.layer3 = nn.Linear(128, n_actions)
 
     def forward(self, x): 
-        print(x.dtype)
         x = F.relu(self.layer1(x))
         x = F.relu(self.layer2(x))
         return self.layer3(x)
@@ -86,8 +89,8 @@ def select_action(state):
                 logging.info(f'state, policy_net(state) :: {state}, {policy_net(state)}')
             return policy_net(state).max(1)[1].view(1, 1)
     else:
-        return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
-    
+        #return torch.tensor([[env.action_space.sample()]], device=device, dtype=torch.long)
+        return torch.tensor([[random.randrange(0,2)]])
 episode_durations = [] 
 
 def plot_durations(show_result=False):
@@ -126,6 +129,9 @@ def optimize_model():
     state_batch = torch.cat(batch.state)
     action_batch = torch.cat(batch.action)
     reward_batch = torch.cat(batch.reward)
+    #logging.info(f'updating state/action/reward: {state_batch, action_batch, reward_batch}')
+    #logging.info(f'policy net pre-update {policy_net(state_batch)}')
+
     state_action_values = policy_net(state_batch).gather(1, action_batch)
 
     next_state_values = torch.zeros(BATCH_SIZE, device=device)
@@ -146,10 +152,13 @@ def optimize_model():
     torch.nn.utils.clip_grad_value_(policy_net.parameters(), 100)
     optimizer.step()
 
+    #logging.info(f'policy net post-update {policy_net(state_batch)}')
+
+
 if torch.cuda.is_available():
     num_episodes = 600
 else:
-    num_episodes = 600
+    num_episodes = 500
 
 for i in range(num_episodes):
     state, info = env.reset()
@@ -179,9 +188,15 @@ for i in range(num_episodes):
 
         if done: 
             episode_durations.append(t+1)
-            print(f'steps taken: {t}')
+            print(f'finished episode {i} :: steps taken: {t}')
             #plot_durations()
             break
+
+logging.info('policy learned:')
+logging.info(f'state 0: {target_net(torch.tensor([0.]))}')
+logging.info(f'state 1: {target_net(torch.tensor([1.]))}')
+logging.info(f'state 2: {target_net(torch.tensor([2.]))}')
+
 
 print('Complete')
 plot_durations(show_result=True)

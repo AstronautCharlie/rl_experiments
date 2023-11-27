@@ -45,7 +45,7 @@ class SimpleEnv:
         b -> a: 0
         b -> c: 1
         c -> b: 1
-        c -> a: -2
+        c -> a: -100
     Agent should learn the following policy: 
         a: 1
         b: 1
@@ -89,4 +89,4 @@ class SimpleEnv:
                     return np.array([2.], dtype=float), 0, False, False, None
                 else:
                     self.state = np.array([0.])
-                    return np.array([0.], dtype=float), -2, False, False, None
+                    return np.array([0.], dtype=float), -100, False, False, None

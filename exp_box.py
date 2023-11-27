@@ -1,4 +1,5 @@
 import logging
+import torch
 
 from itertools import count
 from data_structures.step import Step
@@ -15,6 +16,11 @@ class ExperimentBox:
         while not self.experiment_is_over():
             self.run_episode()
         self.telemetry.write_results()
+        logging.info('policy learned:')
+        logging.info(f'state 0: {self.model.target_net(torch.tensor([0.]))}')
+        logging.info(f'state 1: {self.model.target_net(torch.tensor([1.]))}')
+        logging.info(f'state 2: {self.model.target_net(torch.tensor([2.]))}')
+
 
     def experiment_is_over(self):
         return self.telemetry.completion_conditions_met()
@@ -23,12 +29,9 @@ class ExperimentBox:
         state, _ = self.env.reset()
         for t in count():
             # Get action
-            logging.info(f'state: {state}')
             action = self.model.select_action(state)
-            logging.info(f'picking action: {action}')
             # Apply action
             next_state, reward, terminated, truncated, info = self.env.step(action)
-            logging.info(f'next state/reward: {next_state}, {reward}')
             # Bundle all the step info together
             step = Step(state, action, next_state, reward, terminated, truncated, info)
             # Make step update to model
